@@ -31,6 +31,8 @@ Connection string: `mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet
 
 ## Test Scenarios
 
+### Regular Test (With Timeouts - Throws Errors)
+
 **Lose majority (WriteConcernFailed):**
 ```bash
 npm run stop:member -- mongo2
@@ -58,6 +60,73 @@ npm run start:member -- mongo2
 export OP_MAXTIME_MS=1
 npm run run:tx
 ```
+
+### Production Simulation (NO Timeouts - Hangs Indefinitely)
+
+**⚠️ WARNING:** These tests have NO timeouts and will HANG INDEFINITELY if majority is lost (simulating production behavior). Use `Ctrl+C` to kill the process.
+
+#### Option A: Hang on Write Operation
+
+1. Start the no-timeout test:
+```bash
+npm run build
+npm run run:tx-notimeout
+```
+
+2. When you see "💡 STOP NODES NOW! You have 5 seconds...", quickly run:
+```bash
+docker stop mongo2 mongo3
+```
+
+3. The script should **hang indefinitely** at the update operation.
+
+4. Use `Ctrl+C` to kill, then restore:
+```bash
+docker start mongo2 mongo3
+```
+
+#### Option B: Hang on Commit (Most Common Production Scenario)
+
+This reproduces the most common production case where operations complete but commit hangs:
+
+1. Start the hang-on-commit test:
+```bash
+npm run build
+npm run run:tx-hangcommit
+```
+
+2. Wait for the countdown (20 seconds), then when prompted, choose ONE of these:
+
+   **Option 1: Network Partition (More Realistic)**
+   ```bash
+   npm run partition:member -- mongo2 mongo3
+   ```
+   This simulates a network partition where nodes stay running but become unreachable (closer to production behavior).
+
+   **Option 2: Stop Containers (Simpler)**
+   ```bash
+   docker stop mongo2 mongo3
+   ```
+   This is simpler but the primary detects the failure faster and may throw an error instead of hanging.
+
+3. The script should **hang indefinitely** at `commitTransaction()`!
+
+4. Use `Ctrl+C` to kill, then restore:
+   ```bash
+   # If you used network partition:
+   npm run restore:member -- mongo2 mongo3
+
+   # If you used docker stop:
+   docker start mongo2 mongo3
+   ```
+
+**Key differences in no-timeout tests:**
+- `socketTimeoutMS=0` (infinite socket timeout)
+- No `wtimeout` in write concern
+- No `maxCommitTimeMS` on transaction
+- No `maxTimeMS` on operations
+
+This matches typical production configurations where timeouts are not explicitly set, causing commits to hang forever when replica set loses majority.
 
 ## Configuration
 

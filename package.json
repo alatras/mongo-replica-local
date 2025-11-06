@@ -9,9 +9,14 @@
     "stop:member": "bash ./scripts/stop-member.sh",
     "start:member": "bash ./scripts/start-member.sh",
     "kill:member": "bash ./scripts/kill-member.sh",
+    "partition:member": "bash ./scripts/partition-members.sh",
+    "restore:member": "bash ./scripts/restore-members.sh",
     "stepdown": "bash ./scripts/stepdown-primary.sh",
     "build": "tsc",
-    "run:tx": "node dist/run-transaction.js"
+    "run:tx": "node dist/run-transaction.js",
+    "run:tx-notimeout": "node dist/run-transaction-no-timeout.js",
+    "run:tx-hangcommit": "node dist/run-transaction-hang-on-commit.js",
+    "run:tx-pause": "node dist/run-transaction-hang-pause.js"
   },
   "keywords": [
     "mongodb",
