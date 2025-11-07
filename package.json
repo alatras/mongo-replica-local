@@ -27,6 +27,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@hyperswarm/rpc": "^3.4.0",
     "mongodb": "^6.3.0"
   },
   "devDependencies": {
