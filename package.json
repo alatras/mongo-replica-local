@@ -1,0 +1,40 @@
+{
+  "name": "mongo-timeout-repro",
+  "version": "1.0.0",
+  "description": "Minimal repo to reproduce and validate MongoDB timeout/transaction behavior",
+  "main": "dist/run-transaction.js",
+  "scripts": {
+    "start:db": "docker compose up -d",
+    "init:rs": "bash ./scripts/init-rs.sh",
+    "stop:member": "bash ./scripts/stop-member.sh",
+    "start:member": "bash ./scripts/start-member.sh",
+    "kill:member": "bash ./scripts/kill-member.sh",
+    "partition:member": "bash ./scripts/partition-members.sh",
+    "restore:member": "bash ./scripts/restore-members.sh",
+    "stepdown": "bash ./scripts/stepdown-primary.sh",
+    "build": "tsc",
+    "run:tx": "node dist/run-transaction.js",
+    "run:tx-notimeout": "node dist/run-transaction-no-timeout.js",
+    "run:tx-hangcommit": "node dist/run-transaction-hang-on-commit.js",
+    "run:tx-pause": "node dist/run-transaction-hang-pause.js"
+  },
+  "keywords": [
+    "mongodb",
+    "transactions",
+    "timeout",
+    "replica-set"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@hyperswarm/rpc": "^3.4.0",
+    "mongodb": "^6.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
